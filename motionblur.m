@@ -104,13 +104,14 @@ function [intrep] = BilinearInterp(i,j,I)
     intrep = (1-del_x)*(1-del_y)*I(j,i) + (1-del_x)*(del_y)*I(j,i+1) + (del_x)*(1-del_y)*I(j+1,i) + (del_x)*(del_y)*I(j+1,i+1);
 end
 
-function [repeated_rows,repeat_count] = get_unique(A)
-    B = sortrows(A);
-    S = [1;any(diff(B),2)];
-    [L,S] = regexp(sprintf('%i',S'),'1(0)+','start','end');
-    repeated_rows = B(S,:); % Repeated Rows.
-    repeat_count = (S-L+1)'; % How often each repeated row appears.
+function [unique_rows,weight] = get_unique(A)
+    unique_rows = unique(A,'rows');
+    weight = zeros(size(unique_rows,1),1);
+    for i = 1:size(unique_rows)
+        weight(i,1) = sum(ismember(A,unique_rows(i,:),'rows'));
+    end
 end
+
 
 function [er] = min_square_error(b1,b2)
     no_pixels = size(b1(:),1);
